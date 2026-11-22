@@ -1,0 +1,44 @@
+:root {
+  --bg: #110e0c;
+  --ink: #fff6ec;
+  --accent: #ff6a2c;
+  --accent-2: #ffb03a;
+  --good: #5ee0a0;
+  --card: #221b16;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  background: radial-gradient(90% 60% at 50% 0%, #3a2218, var(--bg));
+  color: var(--ink);
+}
+button { font: inherit; }
+.shell { min-height: 100vh; display: grid; align-content: center; gap: 16px; padding: 20px; text-align: center; }
+.eyebrow { margin: 0; letter-spacing: 0.16em; text-transform: uppercase; font-size: 12px; color: var(--accent-2); }
+h1 { margin: 0; font-family: Georgia, serif; font-weight: 600; }
+#time {
+  margin: 0;
+  font-size: clamp(64px, 18vw, 112px);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
+.presets, .controls { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.presets button, .controls button {
+  min-height: 48px;
+  min-width: 72px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 210, 170, 0.18);
+  background: var(--card);
+  color: var(--ink);
+  padding: 0 16px;
+}
+.controls .primary {
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color: #2a1208;
+  border: 0;
+  font-weight: 750;
+  min-width: 120px;
+}
+#done { margin: 0; min-height: 24px; color: var(--good); font-size: 18px; }

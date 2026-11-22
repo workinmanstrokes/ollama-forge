@@ -1,0 +1,16 @@
+node_modules/
+dist/
+forge-projects/
+test-results/
+playwright-report/
+blob-report/
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/captures/
+android/.idea/
+*.iml
+.DS_Store
+*.log
+*.tsbuildinfo

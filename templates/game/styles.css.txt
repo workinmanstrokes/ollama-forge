@@ -1,0 +1,65 @@
+:root {
+  --bg: #14100e;
+  --ink: #fff6ec;
+  --accent: #ff6a2c;
+  --accent-2: #ffb03a;
+  --good: #5ee0a0;
+  --card: #2a2118;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+button { font: inherit; }
+.shell { min-height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.hud { display: flex; justify-content: space-between; align-items: flex-end; }
+.eyebrow { margin: 0; letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; color: var(--accent-2); }
+h1 { margin: 0; font-family: Georgia, serif; font-size: 28px; }
+#score { font-size: 32px; font-variant-numeric: tabular-nums; color: var(--accent-2); }
+#track {
+  position: relative;
+  height: 280px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: linear-gradient(#243044, #1a120e 70%);
+  touch-action: manipulation;
+  box-shadow: inset 0 0 0 1px rgba(255, 210, 170, 0.14);
+}
+#ground {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 46px;
+  background: linear-gradient(#6b3d28, #3a2418);
+}
+#player { position: absolute; left: 42px; bottom: 28px; width: 42px; height: 54px; }
+.flame, .pack, .leg { position: absolute; display: block; }
+.pack { left: 8px; top: 16px; width: 26px; height: 24px; border-radius: 8px; background: #4a2c22; }
+.flame { left: 15px; top: 4px; width: 12px; height: 16px; border-radius: 8px 8px 4px 4px; background: linear-gradient(var(--accent-2), var(--accent)); }
+.leg { bottom: 0; width: 7px; height: 16px; border-radius: 4px; background: #e7c3a2; }
+.leg.left { left: 12px; }
+.leg.right { left: 24px; }
+.rock {
+  position: absolute;
+  left: 0;
+  bottom: 36px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: #8d6248;
+  box-shadow: inset 0 -6px 0 #5c3b2a;
+}
+.hint { margin: 0; color: rgba(255, 246, 236, 0.72); }
+#over { text-align: center; }
+#over[hidden] { display: none; }
+button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color: #2a1208;
+  font-weight: 700;
+}

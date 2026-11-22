@@ -1,0 +1,51 @@
+:root {
+  --bg: #140e12;
+  --ink: #fff6ec;
+  --accent: #ff6a2c;
+  --accent-2: #ffb03a;
+  --good: #5ee0a0;
+  --card: #241820;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  background: radial-gradient(120% 80% at 50% -10%, #3a1820, var(--bg));
+  color: var(--ink);
+}
+button, input { font: inherit; }
+.shell { min-height: 100%; display: flex; flex-direction: column; gap: 12px; padding: 16px; }
+.hud, .stats { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.eyebrow { margin: 0; letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; color: var(--accent-2); }
+h1 { margin: 0; font-family: Georgia, "Iowan Old Style", serif; font-size: 28px; font-weight: 600; }
+#score { font-variant-numeric: tabular-nums; font-size: 28px; color: var(--accent-2); }
+#lives { letter-spacing: 2px; color: var(--accent); }
+canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+  background: #100c0a;
+  touch-action: none;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(255, 200, 150, 0.16);
+}
+.hint { margin: 0; color: rgba(255, 246, 236, 0.72); font-size: 14px; }
+#over {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 6, 8, 0.72);
+  text-align: center;
+  padding: 24px;
+}
+#over[hidden] { display: none; }
+#over p { font-size: 22px; margin: 0 0 12px; }
+button {
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  padding: 0 18px;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color: #2a1208;
+  font-weight: 700;
+}

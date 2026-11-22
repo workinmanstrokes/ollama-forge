@@ -1,0 +1,51 @@
+:root {
+  --bg: #14110f;
+  --ink: #fff6ec;
+  --accent: #ff6a2c;
+  --accent-2: #ffb03a;
+  --good: #5ee0a0;
+  --card: #241c18;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+button { font: inherit; }
+.shell { padding: 16px; display: grid; gap: 14px; max-width: 640px; margin: 0 auto; }
+.top { display: flex; justify-content: space-between; align-items: flex-end; }
+.eyebrow { margin: 0; letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; color: var(--accent-2); }
+h1 { margin: 0; font-family: Georgia, serif; font-size: 32px; }
+.progress { height: 8px; border-radius: 99px; background: #2c241e; overflow: hidden; }
+.progress span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.card {
+  background: var(--card);
+  border-radius: 22px;
+  padding: 18px;
+  border: 1px solid rgba(255, 210, 170, 0.12);
+  display: grid;
+  gap: 10px;
+}
+.choices { display: grid; gap: 8px; }
+.choice {
+  min-height: 52px;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 210, 170, 0.16);
+  background: #1a1411;
+  color: var(--ink);
+  padding: 0 14px;
+}
+.choice.right { border-color: var(--good); }
+.choice.wrong { border-color: #ff8d7a; }
+.note { min-height: 24px; margin: 0; color: var(--accent-2); }
+button.primary {
+  min-height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color: #2a1208;
+  font-weight: 700;
+}
