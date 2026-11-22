@@ -26,7 +26,7 @@ export default defineConfig({
   projects: [
     {
       name: "phone",
-      testMatch: /forge\.spec\.ts/,
+      testMatch: /forge\.spec\.ts|multi\.spec\.ts/,
       use: {
         viewport: { width: 412, height: 915 },
         deviceScaleFactor: 2,

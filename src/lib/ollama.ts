@@ -139,6 +139,7 @@ export async function chatStream(opts: {
   contextSize: number;
   signal?: AbortSignal;
   onToken?: (token: string) => void;
+  format?: "json" | Record<string, unknown>;
 }): Promise<string> {
   if (!opts.model.trim()) throw new Error("Pick a model in Settings first.");
   const link = connectGuard(opts.signal, 60000);
@@ -152,6 +153,7 @@ export async function chatStream(opts: {
         messages: opts.messages,
         stream: true,
         options: { temperature: opts.temperature, num_ctx: opts.contextSize },
+        ...(opts.format ? { format: opts.format } : {}),
       }),
     });
     link.connected();

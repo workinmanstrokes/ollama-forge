@@ -1,0 +1,36 @@
+:root {
+  --bg: #140e12;
+  --ink: #fff6ec;
+  --accent: #ff6a2c;
+  --accent-2: #ffb03a;
+  --good: #5ee0a0;
+  --card: #241820;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Segoe UI", "Avenir Next", system-ui, sans-serif;
+  background: radial-gradient(90% 60% at 50% 0%, #3a2218, var(--bg));
+  color: var(--ink);
+}
+button { font: inherit; }
+#app { min-height: 100%; }
+.shell { min-height: 100%; display: flex; flex-direction: column; gap: 10px; padding: 14px; }
+.hud, .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.eyebrow { margin: 0; letter-spacing: 0.14em; text-transform: uppercase; font-size: 11px; color: var(--accent-2); }
+h1 { margin: 0; font-family: Georgia, serif; font-size: 28px; }
+canvas { width: 100%; height: auto; border-radius: 18px; background: #100c0a; touch-action: none; }
+[hidden] { display: none !important; }
+.overlay {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(10, 6, 8, 0.72); text-align: center; padding: 16px;
+}
+.stage { position: relative; }
+button.play, .pad button {
+  min-height: 48px; border: 0; border-radius: 14px; padding: 0 16px;
+  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  color: #2a1208; font-weight: 750;
+}
+.pad { display: flex; gap: 8px; }
+.pad button { min-width: 64px; }
+.hint { margin: 0; color: rgba(255, 246, 236, 0.75); font-size: 14px; }

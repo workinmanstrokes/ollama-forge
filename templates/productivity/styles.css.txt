@@ -1,0 +1,11 @@
+:root { --bg: #14110f; --ink: #fff6ec; --accent: #ff6a2c; --accent-2: #ffb03a; --card: #241c18; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+.shell { padding: 14px; display: grid; gap: 12px; }
+h1, h2 { font-family: Georgia, serif; margin: 0; }
+.fk-tabs, .fk-btn, button { min-height: 48px; border-radius: 14px; border: 1px solid rgba(255,210,170,.18); background: var(--card); color: var(--ink); }
+.fk-tabs { display: flex; gap: 8px; }
+.fk-tabs .on, .fk-btn { background: linear-gradient(180deg, var(--accent-2), var(--accent)); color: #2a1208; font-weight: 750; }
+.fk-card { background: var(--card); border-radius: 18px; padding: 14px; display: grid; gap: 8px; }
+input, textarea { width: 100%; min-height: 48px; border-radius: 12px; border: 1px solid rgba(255,210,170,.2); background: #120e0c; color: var(--ink); padding: 10px; }
+li { margin: 6px 0; }

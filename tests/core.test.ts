@@ -17,17 +17,20 @@ describe("templates", () => {
     for (const info of TEMPLATES) {
       const { files } = getTemplate(info.kind);
       const names = files.map((file) => file.path);
-      expect(names).toEqual(["index.html", "styles.css", "main.js", "checks.js"]);
-      const html = files[0]?.content ?? "";
+      if (info.multi) {
+        expect(files.length).toBeGreaterThanOrEqual(4);
+        expect(names).toContain("src/main.js");
+      } else {
+        expect(names).toEqual(["index.html", "styles.css", "main.js", "checks.js"]);
+      }
+      const html = files.find((file) => file.path === "index.html")?.content ?? "";
       expect(html).toContain('id="app"');
       expect(html).toContain("styles.css");
-      expect(html).toContain("main.js");
       for (const file of files) {
         expect(file.content).not.toMatch(/https?:\/\//);
         expect(assertSafe(file.content).ok).toBe(true);
-        if (file.path.endsWith(".js")) new Function(file.content);
+        if (file.path.endsWith(".js") && !/^\s*import\s/m.test(file.content) && !/^\s*export\s/m.test(file.content)) new Function(file.content);
       }
-      expect(files[2]?.content).toContain("const TITLE");
     }
   });
 

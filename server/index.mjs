@@ -1,4 +1,5 @@
 import http from "node:http";
+import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -151,6 +152,32 @@ export function createForgeServer(options = {}) {
         const payload = JSON.parse((await readBody(req, 4_000_000)).toString("utf8") || "{}");
         const saved = writeProject(projects, projectMatch[1], payload);
         send(res, 200, JSON.stringify(saved));
+        return;
+      }
+      if (req.method === "POST" && url.pathname === "/api/export-apk") {
+        const payload = JSON.parse((await readBody(req, 64_000)).toString("utf8") || "{}");
+        const id = String(payload.id || "");
+        const folder = path.join(projects, id);
+        const home = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT || "";
+        if (!id || !fs.existsSync(folder)) {
+          send(res, 404, JSON.stringify({ error: "Save the project to the PC before building an APK." }));
+          return;
+        }
+        if (!home) {
+          send(res, 409, JSON.stringify({ error: "No Android SDK found. Set ANDROID_HOME, then run: npm run export-apk -- forge-projects/" + id }));
+          return;
+        }
+        const child = spawn(process.execPath, ["scripts/export-apk.mjs", folder], { cwd: process.cwd() });
+        let log = "";
+        child.stdout.on("data", (chunk) => { log += chunk; });
+        child.stderr.on("data", (chunk) => { log += chunk; });
+        child.on("exit", (code) => {
+          send(res, code === 0 ? 200 : 500, JSON.stringify({
+            ok: code === 0,
+            apk: "android/app/build/outputs/apk/debug/app-debug.apk",
+            log: log.slice(-2000),
+          }));
+        });
         return;
       }
       if (req.method === "POST" && url.pathname === "/api/share") {

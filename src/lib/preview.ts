@@ -1,3 +1,4 @@
+import { buildModuleSrcdoc, usesModules } from "./modules";
 import type { ProjectFile, SmokeIssue } from "./types";
 
 export function escapeScript(code: string): string {
@@ -15,6 +16,7 @@ function innerBody(html: string): string {
 }
 
 export function buildSrcdoc(files: ProjectFile[]): string {
+  if (usesModules(files)) return buildModuleSrcdoc(files);
   const html = file(files, "index.html");
   const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
   const title = titleMatch?.[1]?.trim() || "Preview";
@@ -83,10 +85,16 @@ ${innerBody(html)}
 </html>`;
 }
 
+function filenameFrom(data: { message?: string; filename?: string }): string {
+  const text = `${data.filename || ""} ${data.message || ""}`;
+  const named = text.match(/((?:src|tests)\/[a-zA-Z0-9_./-]+\.js|[a-zA-Z0-9_.-]+\.js)/);
+  return named?.[1] || data.filename || "main.js";
+}
+
 export function runSmokeTest(
   files: ProjectFile[],
   host: HTMLElement,
-  opts?: { assertions?: boolean; signal?: AbortSignal },
+  opts?: { assertions?: boolean; play?: boolean; signal?: AbortSignal },
 ): Promise<SmokeIssue[]> {
   const assertions = opts?.assertions !== false;
   return new Promise((resolve, reject) => {
@@ -102,6 +110,7 @@ export function runSmokeTest(
     const finish = () => {
       if (settled) return;
       settled = true;
+      window.clearTimeout(playTimer);
       window.clearTimeout(checksTimer);
       window.clearTimeout(doneTimer);
       window.removeEventListener("message", onMessage);
@@ -114,11 +123,15 @@ export function runSmokeTest(
         type?: string;
         message?: string;
         filename?: string;
+        ok?: boolean;
         results?: { ok: boolean; message: string }[];
       };
       if (!data || data.source !== "forge-preview") return;
       if (data.type === "error" || (data.type === "console" && data.message)) {
-        issues.push({ message: data.message || "Unknown error", filename: data.filename || "main.js" });
+        issues.push({ message: data.message || "Unknown error", filename: filenameFrom(data) });
+      }
+      if (data.type === "play-result" && data.ok === false) {
+        issues.push({ message: data.message || "Play check failed", filename: "src/main.js" });
       }
       if (data.type === "checks" && assertions) {
         for (const result of data.results ?? []) {
@@ -127,6 +140,9 @@ export function runSmokeTest(
       }
     };
     window.addEventListener("message", onMessage);
+    const playTimer = window.setTimeout(() => {
+      if (opts?.play) iframe.contentWindow?.postMessage({ source: "forge-host", type: "play", actions: ["start", "right", "jump"] }, "*");
+    }, 400);
     const checksTimer = window.setTimeout(() => {
       if (assertions) iframe.contentWindow?.postMessage({ source: "forge-host", type: "run-checks" }, "*");
     }, 700);
@@ -134,6 +150,7 @@ export function runSmokeTest(
     opts?.signal?.addEventListener("abort", () => {
       if (settled) return;
       settled = true;
+      window.clearTimeout(playTimer);
       window.clearTimeout(checksTimer);
       window.clearTimeout(doneTimer);
       window.removeEventListener("message", onMessage);

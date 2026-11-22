@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 const MODELS = [
   { name: "qwen2.5-coder:7b", size: 0 },
   { name: "llama3.1:8b", size: 0 },
+  { name: "qwen2.5-coder:32b", size: 0 },
 ];
 
 function readBody(req) {
@@ -27,6 +28,32 @@ function titleFrom(text) {
   if (planned) return planned[1];
   const typed = text.match(/Title:\s*([^\n]+)/i);
   return typed ? typed[1].trim() : "Spark Project";
+}
+
+function architect(text) {
+  const title = titleFrom(text);
+  const paths = [...text.matchAll(/^- (\S+)/gm)].map((match) => match[1]).filter((path) => path.endsWith(".js") && path !== "checks.js" && !path.startsWith("tests/"));
+  const modules = paths.map((path) => ({
+    path,
+    summary: path,
+    exports: [],
+    imports: [],
+    milestone: "play",
+  }));
+  modules.push({ path: "src/credits.js", summary: "Credits line", exports: ["CREDIT"], imports: [], milestone: "polish" });
+  return JSON.stringify({
+    title,
+    summary: "A multi-file kid-safe project.",
+    features: ["menu", "pause", "save"],
+    screens: ["menu", "play"],
+    dataModel: [{ name: "Save", fields: ["best"] }],
+    modules,
+    milestones: [
+      { id: "play", title: "Playable build", summary: "The game you can start.", files: modules.filter((item) => item.milestone === "play").map((item) => item.path) },
+      { id: "polish", title: "Credits", summary: "Add a credits line.", files: ["src/credits.js"] },
+    ],
+    palette: ["#140e12", "#ff6a2c", "#ffb03a", "#fff6ec", "#5ee0a0"],
+  });
 }
 
 function plan(text) {
@@ -76,7 +103,9 @@ function replyFor(body) {
   const messages = Array.isArray(body.messages) ? body.messages : [];
   const system = messages.filter((item) => item.role === "system").map((item) => item.content).join("\n");
   const user = messages.filter((item) => item.role === "user").map((item) => item.content).join("\n");
+  if (system.includes("You are the architect")) return architect(user);
   if (system.includes("You are the planner")) return plan(user);
+  if (system.includes("You review")) return JSON.stringify({ ok: true, notes: "Checklist looks kid-safe and finished." });
   if (system.includes("You fix bugs")) return fix(user);
   if (system.includes("You edit one file")) return edit(user);
   return code(user);
@@ -122,6 +151,13 @@ export function createMockOllama() {
     if (req.method === "GET" && url.pathname === "/api/tags") {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ models: MODELS }));
+      return;
+    }
+    if (req.method === "POST" && url.pathname === "/api/show") {
+      const body = JSON.parse((await readBody(req)) || "{}");
+      const size = /32b/i.test(body.name || "") ? 32768 : 8192;
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ model_info: { "general.context_length": size } }));
       return;
     }
     if (req.method === "GET" && url.pathname === "/api/version") {

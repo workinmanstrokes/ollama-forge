@@ -7,10 +7,10 @@ export function CodePane({ project, onChange }: { project: Project; onChange: (p
   const [path, setPath] = useState("main.js");
   const file = project.files.find((item) => item.path === path) ?? project.files[0];
   if (!file) return <p className="muted">This project has no files.</p>;
-  const main = project.files.find((item) => item.path === "main.js")?.content ?? "";
+  const injected = project.files.some((item) => item.content.includes("player crashed"));
   return (
     <div className="code-pane">
-      <span data-testid="file-sync" style={{ display: "none" }}>{main.includes("player crashed") ? "injected" : "ready"}</span>
+      <span data-testid="file-sync" style={{ display: "none" }}>{injected ? "injected" : "ready"}</span>
       <div className="file-chips" role="tablist" aria-label="Files">
         {project.files.map((item) => (
           <button
