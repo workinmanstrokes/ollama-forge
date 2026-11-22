@@ -24,6 +24,11 @@ function emit(projectId: string) {
   for (const listener of listeners.get(projectId) ?? []) listener(snapshot);
 }
 
+export function getJob(projectId: string): JobView | null {
+  const entry = jobs.get(projectId);
+  return entry ? { ...entry.job } : null;
+}
+
 export function subscribeJob(projectId: string, listener: Listener): () => void {
   let set = listeners.get(projectId);
   if (!set) {

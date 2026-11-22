@@ -5,6 +5,8 @@ import { applyModelFiles, applyPalette, basicPlan, parsePlan, pickFileForError, 
 import { coderMessages, editorMessages, fixerMessages, namePrompt, plannerMessages } from "./prompts";
 import { commitFiles } from "./projects";
 import { loadSettings } from "./settings";
+import { buildMulti } from "./build";
+import { searchProject } from "./map";
 import { getTemplate } from "./templates";
 import { contextCharBudget } from "./trim";
 import type { Project, SmokeIssue } from "./types";
@@ -20,6 +22,10 @@ async function clientSettings() {
 export async function generateIntoProject(projectId: string, report: Report, signal: AbortSignal): Promise<void> {
   const project = await getProject(projectId);
   if (!project) throw new Error("That project is missing.");
+  if (getTemplate(project.kind).info.multi) {
+    await buildMulti(projectId, report, signal);
+    return;
+  }
   const { settings, api, budget } = await clientSettings();
   const template = getTemplate(project.kind);
   report({ phase: "Planning", reset: true });
@@ -69,7 +75,8 @@ export async function generateIntoProject(projectId: string, report: Report, sig
 export async function completeEdit(project: Project, instruction: string, onToken: (token: string) => void, signal: AbortSignal): Promise<Project> {
   const { settings, api, budget } = await clientSettings();
   const template = getTemplate(project.kind);
-  const file = project.files.find((item) => item.path === template.info.logicFile);
+  const found = searchProject(project.files, instruction)[0];
+  const file = project.files.find((item) => item.path === found?.path) || project.files.find((item) => item.path === template.info.logicFile);
   if (!file) throw new Error("There is no file to edit.");
   const text = await chatStream({
     base: api.base,

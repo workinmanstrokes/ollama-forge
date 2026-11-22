@@ -1,0 +1,12 @@
+:root { --bg: #14110e; --ink: #fff6ec; --accent: #ff6a2c; --accent-2: #ffb03a; --good: #5ee0a0; --card: #241c16; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+.shell { padding: 14px; display: grid; gap: 10px; }
+h1 { font-family: Georgia, serif; margin: 0; }
+.grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.cell { aspect-ratio: 1; border-radius: 10px; background: #2a2118; }
+.cell.me { background: var(--accent); }
+.cell.item { background: var(--accent-2); }
+button, .pad button { min-height: 48px; border-radius: 12px; border: 1px solid rgba(255,210,170,.2); background: var(--card); color: var(--ink); }
+.bag { display: flex; gap: 8px; flex-wrap: wrap; }
+.bag span { background: var(--card); border-radius: 999px; padding: 8px 12px; }

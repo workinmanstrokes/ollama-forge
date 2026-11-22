@@ -7,6 +7,8 @@ export const defaultSettings: Settings = {
   serverUrl: "",
   connection: "auto",
   models: {
+    architect: "qwen2.5-coder:7b",
+    reviewer: "qwen2.5-coder:7b",
     planner: "qwen2.5-coder:7b",
     coder: "qwen2.5-coder:7b",
     fixer: "qwen2.5-coder:7b",
@@ -14,6 +16,8 @@ export const defaultSettings: Settings = {
   knownModels: [],
   temperature: 0.4,
   contextSize: 4096,
+  autoRoute: true,
+  localImage: false,
 };
 
 function storage(): Storage | null {
@@ -35,7 +39,9 @@ export function loadSettings(): Settings {
       models: { ...defaultSettings.models, ...parsed.models },
       knownModels: Array.isArray(parsed.knownModels) ? parsed.knownModels.filter((item) => typeof item === "string") : [],
       temperature: clamp(Number(parsed.temperature ?? defaultSettings.temperature), 0, 1),
-      contextSize: [2048, 4096, 8192].includes(Number(parsed.contextSize)) ? Number(parsed.contextSize) : 4096,
+      contextSize: [2048, 4096, 8192, 16384, 32768].includes(Number(parsed.contextSize)) ? Number(parsed.contextSize) : 4096,
+      autoRoute: parsed.autoRoute !== false,
+      localImage: parsed.localImage === true,
     };
   } catch {
     return structuredClone(defaultSettings);

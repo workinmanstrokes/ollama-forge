@@ -63,6 +63,14 @@ export function ExportPane({ project, files }: { project: Project; files: Projec
       <div className="button-row">
         <button type="button" className="primary" data-testid="export-zip" onClick={() => void downloadProject()}>Download project ZIP</button>
         <button type="button" className="secondary" data-testid="export-pwa" disabled={busy} onClick={() => void downloadPwa()}>Download standalone PWA</button>
+        <button type="button" className="secondary" disabled={busy} onClick={() => {
+          setBusy(true);
+          setNote("Bundling with esbuild…");
+          void import("../lib/esbuildBundle").then((mod) => mod.bundleWithEsbuild(files)).then((code) => {
+            downloadBytes(zipTextFiles([{ path: "index.html", content: `<!DOCTYPE html><html><body><div id="app"></div><script>${code.replace(/<\/script/gi, "<\\/script")}</script></body></html>` }]), `${slugify(project.name)}-esbuild.zip`, "application/zip");
+            setNote("esbuild bundle downloaded.");
+          }).catch((error: unknown) => setNote(error instanceof Error ? error.message : "esbuild could not bundle this project.")).finally(() => setBusy(false));
+        }}>Bundle with esbuild</button>
         {root !== null ? <button type="button" className="secondary" onClick={() => void saveToPc()}>Save to PC</button> : null}
       </div>
       {note ? <p className="muted" role="status">{note}</p> : null}

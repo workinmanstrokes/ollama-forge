@@ -4,6 +4,8 @@ import { useForge } from "../state/Store";
 import type { Role, Settings } from "../lib/types";
 
 const ROLES: { id: Role; label: string }[] = [
+  { id: "architect", label: "Architect" },
+  { id: "reviewer", label: "Reviewer" },
   { id: "planner", label: "Planner" },
   { id: "coder", label: "Coder" },
   { id: "fixer", label: "Fixer" },
@@ -113,9 +115,19 @@ export function SettingsPage() {
             <option value={2048}>2048</option>
             <option value={4096}>4096</option>
             <option value={8192}>8192</option>
+            <option value={16384}>16384</option>
+            <option value={32768}>32768</option>
           </select>
         </label>
-        <p className="muted">Forge trims each prompt to fit this context, then writes one file at a time.</p>
+        <p className="muted">Forge trims each prompt to this context. Bigger models can take 16384 or 32768.</p>
+        <label className="check">
+          <input type="checkbox" checked={settings.autoRoute} onChange={(event) => patch({ autoRoute: event.target.checked })} />
+          Auto-assign models by size. The largest model plans and reviews. A coder model writes files.
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={settings.localImage} onChange={(event) => patch({ localImage: event.target.checked })} />
+          Local images. Off by default. Forge only calls ComfyUI or Stable Diffusion if this is on and one is already running on this machine.
+        </label>
       </section>
       <section className="panel">
         <PhoneGuide />

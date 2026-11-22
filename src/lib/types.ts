@@ -1,4 +1,18 @@
-export type ProjectKind = "arcade" | "game" | "puzzle" | "idle" | "quiz" | "utility" | "landing";
+export type ProjectKind =
+  | "arcade"
+  | "game"
+  | "puzzle"
+  | "idle"
+  | "quiz"
+  | "utility"
+  | "landing"
+  | "platformer"
+  | "shooter"
+  | "rpg"
+  | "cards"
+  | "productivity"
+  | "tracker"
+  | "chatapp";
 
 export type ProjectFile = {
   path: string;
@@ -28,6 +42,45 @@ export type ChatMessage = {
   createdAt: number;
 };
 
+export type ModuleSpec = {
+  path: string;
+  summary: string;
+  exports: string[];
+  imports: string[];
+  milestone: string;
+};
+
+export type Milestone = {
+  id: string;
+  title: string;
+  summary: string;
+  files: string[];
+  status: "pending" | "approved" | "building" | "ready";
+};
+
+export type ProjectSpec = {
+  title: string;
+  summary: string;
+  features: string[];
+  screens: string[];
+  dataModel: { name: string; fields: string[] }[];
+  modules: ModuleSpec[];
+  milestones: Milestone[];
+  palette: string[];
+};
+
+export type ReviewItem = { id: string; ok: boolean; detail: string };
+
+export type BuildState = {
+  status: "idle" | "architecting" | "building" | "awaiting" | "reviewing" | "paused" | "done" | "error";
+  spec: ProjectSpec | null;
+  summaries: Record<string, string>;
+  nextFile: string | null;
+  review: ReviewItem[];
+  error: string;
+  updatedAt: number;
+};
+
 export type Project = {
   id: string;
   name: string;
@@ -40,9 +93,10 @@ export type Project = {
   snapshots: Snapshot[];
   chat: ChatMessage[];
   plan: Plan | null;
+  build?: BuildState | null;
 };
 
-export type Role = "planner" | "coder" | "fixer";
+export type Role = "architect" | "reviewer" | "planner" | "coder" | "fixer";
 
 export type Settings = {
   ollamaUrl: string;
@@ -52,6 +106,8 @@ export type Settings = {
   knownModels: string[];
   temperature: number;
   contextSize: number;
+  autoRoute: boolean;
+  localImage: boolean;
 };
 
 export type SmokeIssue = {

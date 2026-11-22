@@ -131,6 +131,9 @@ p { margin: 0 0 10px; }
   background: rgba(255, 176, 58, 0.08);
   border: 1px solid var(--line);
 }
+.milestone-list, .review-list { display: grid; gap: 8px; margin: 8px 0 12px; }
+.pixel-row { display: flex; gap: 12px; align-items: center; }
+.pixel-row canvas, .sprite-preview { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 12px; background: #120e0c; }
 .hero-block, .panel, .project-card, .template-card, .stream-card, .empty {
   background: linear-gradient(180deg, rgba(255, 220, 190, 0.04), transparent 28%), var(--bg-2);
   border: 1px solid var(--line);

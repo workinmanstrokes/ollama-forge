@@ -5,6 +5,10 @@ declare module "../mock/ollama-server.mjs" {
   };
 }
 
+declare module "../scripts/export-apk.mjs" {
+  export function exportApkStatus(): { ok: boolean; home?: string; message: string };
+}
+
 declare module "../server/index.mjs" {
   export function createForgeServer(options?: {
     port?: number;

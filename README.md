@@ -19,6 +19,8 @@ Made for Michael. The phone it is aimed at is a Samsung S25 Ultra. The heavy mod
 
 ![Phone preview of a generated arcade game](docs/screenshots/phone-preview.png)
 
+![Multi-file platformer](docs/screenshots/phone-platformer.png)
+
 ![Desktop studio](docs/screenshots/desktop-studio.png)
 
 ## PC setup
@@ -154,6 +156,30 @@ bubblewrap build
 ```
 
 [PWABuilder](https://www.pwabuilder.com/) can wrap a hosted manifest too. Forge does not upload the project.
+
+## Bigger projects
+
+Multi-file templates (platformer, top-down Kaboom scene, inventory walk, card pairs, Preact task list, tracker, local chat) build in milestones.
+
+1. The architect writes a spec: features, screens, data model, file tree, and module interfaces. The call uses Ollama's structured `format` schema.
+2. A queue writes one file at a time. Each prompt gets a project map (short summaries of the other files) instead of the whole tree, so a 7B context can still grow toward a few dozen files.
+3. The first milestone builds on its own. Later milestones wait for **Build next milestone**. Progress is stored in IndexedDB, so a refresh resumes a build that was still running, and a cancelled build has **Resume build**.
+
+Preview loads ES modules through an import map inside the sandbox, including the offline copies of Preact, Kaboom, `forge-kit` (save, WebAudio tones, particles), and `forge-ui`. **Bundle with esbuild** runs esbuild-wasm in the browser and downloads a single-file zip. Settings can auto-assign the largest installed model to the architect and reviewer, and a coder model to file writing. Chat edits search the project for the file that matches the request.
+
+The asset page draws a pixel sprite, a tileset, an icon set, and a jump WAV on device. ComfyUI (`127.0.0.1:8188`) and Stable Diffusion (`127.0.0.1:7860`) are used only when **Local images** is turned on and the server answers.
+
+Smoke tests run each module's checks and any `window.__forgeTests` the model left behind. Games can run a play check that presses start and moves. Lint uses a real JavaScript parse. The reviewer checklist flags missing menus and placeholder copy. Fix it reads the module name from the stack.
+
+### One-command APK from an export
+
+Save a project to the PC with forge-server, or unzip an export. With the Android SDK installed and `ANDROID_HOME` set:
+
+```bash
+npm run export-apk -- forge-projects/<project-id>
+```
+
+That copies the folder into the Android project's web assets and runs `./gradlew assembleDebug`. The debug APK is `android/app/build/outputs/apk/debug/app-debug.apk`. If the SDK is missing, the command stops and says so. forge-server exposes the same step as `POST /api/export-apk` with `{ "id": "<project-id>" }` after the project has been saved on the PC.
 
 ## How a project is made
 

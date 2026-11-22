@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { deleteProject, listProjects, saveProject } from "../lib/idb";
 import { listModels, resolveApiBase, type ServerHealth } from "../lib/ollama";
+import { assignRoles, suggestedContext } from "../lib/routing";
 import { loadSettings, saveSettings } from "../lib/settings";
 import type { Project, Settings } from "../lib/types";
 
@@ -74,7 +75,12 @@ export function ForgeProvider({ children }: { children: ReactNode }) {
       };
       if (refreshId.current !== id) return next;
       setSettings((prev) => {
-        const saved = { ...prev, knownModels: models };
+        const saved = {
+          ...prev,
+          knownModels: models,
+          models: prev.autoRoute && models.length ? assignRoles(models) : prev.models,
+          contextSize: prev.autoRoute && models.length ? suggestedContext(models) : prev.contextSize,
+        };
         saveSettings(saved);
         return saved;
       });

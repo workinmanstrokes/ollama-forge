@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { saveProject } from "../lib/idb";
+import { approveNextMilestone } from "../lib/build";
 import { generateIntoProject } from "../lib/generate";
-import { cancelJob, startJob, subscribeJob, type JobView } from "../lib/jobs";
+import { cancelJob, getJob, startJob, subscribeJob, type JobView } from "../lib/jobs";
 import type { DeviceFrame, EnvironmentName, ProjectFile, StudioTab } from "../lib/types";
 import { useForge } from "../state/Store";
 import { ChatPane } from "./ChatPane";
@@ -46,6 +47,14 @@ export function Studio() {
     if (job?.done && !job.cancelled && !job.error) void reload();
   }, [job?.done, job?.cancelled, job?.error, reload]);
 
+  useEffect(() => {
+    if (!project) return;
+    const status = project.build?.status;
+    if ((status === "building" || status === "architecting") && !getJob(project.id)) {
+      startJob(project.id, ({ signal, report }) => generateIntoProject(project.id, report, signal));
+    }
+  }, [project]);
+
   if (!ready) return <main className="page"><p className="muted">Opening the project…</p></main>;
   if (!project) {
     return (
@@ -65,19 +74,24 @@ export function Studio() {
     saveChain.current = saveChain.current.then(() => saveProject(next));
   }
 
-  function regenerate() {
-    if (project!.plan) {
-      setConfirmRegen(true);
-      return;
-    }
-    beginGeneration();
-  }
-
-  function beginGeneration() {
+  async function beginGeneration(fresh = false) {
     setConfirmRegen(false);
     setEnv("dev");
     setTab("chat");
-    startJob(project!.id, ({ signal, report }) => generateIntoProject(project!.id, report, signal));
+    let current = project!;
+    if (fresh) {
+      current = { ...current, build: null };
+      await saveProject(current);
+      upsert(current);
+    }
+    startJob(current.id, ({ signal, report }) => generateIntoProject(current.id, report, signal));
+  }
+
+  async function approveMilestone() {
+    const next = approveNextMilestone(project!);
+    await saveProject(next);
+    upsert(next);
+    startJob(next.id, ({ signal, report }) => generateIntoProject(next.id, report, signal));
   }
 
   async function share() {
@@ -113,6 +127,7 @@ export function Studio() {
             <p className={`status-pill ${link.status}`} role="status">{link.status === "online" ? "Online" : link.status === "offline" ? "Offline" : "Checking"}</p>
           </div>
           <h1 data-testid="project-title">{project.name}</h1>
+          <p className="muted" data-testid="file-count">{project.files.length} files</p>
         </div>
         <div className="segmented" role="group" aria-label="Environment">
           {(["dev", "preview", "prod"] as EnvironmentName[]).map((item) => (
@@ -132,7 +147,25 @@ export function Studio() {
           {!job.done && job.output ? <pre className="stream">{job.output}</pre> : null}
         </section>
       ) : null}
-      {!project.plan && !job ? <p className="note">This is the playable starter. Connect Ollama and regenerate to customize it.</p> : null}
+      {project.build?.spec ? (
+        <div className="milestone-list">
+          {project.build.spec.milestones.map((item) => (
+            <p key={item.id} className="note">{item.title} · {item.status}</p>
+          ))}
+          {project.build.status === "awaiting" ? (
+            <button type="button" className="primary" data-testid="approve-milestone" onClick={() => void approveMilestone()}>Build next milestone</button>
+          ) : null}
+          {project.build.status === "paused" ? (
+            <button type="button" className="secondary" onClick={() => void beginGeneration(false)}>Resume build</button>
+          ) : null}
+          {project.build.review.length ? (
+            <ul className="review-list">
+              {project.build.review.map((item) => <li key={item.id}>{item.ok ? "Ready" : "Check"} · {item.detail}</li>)}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
+      {!project.plan && !project.build && !job ? <p className="note">This is the playable starter. Connect Ollama and regenerate to customize it.</p> : null}
       {env === "dev" ? (
         <div className={wide ? "studio-grid" : "studio-stack"}>
           <div className="studio-main">{tool}</div>
@@ -164,7 +197,7 @@ export function Studio() {
               </button>
             ))}
           </nav>
-          <button type="button" className="secondary" onClick={regenerate}>Regenerate</button>
+          <button type="button" className="secondary" onClick={() => { if (project.plan || project.build) setConfirmRegen(true); else void beginGeneration(false); }}>Regenerate</button>
         </div>
       ) : null}
       {confirmRegen ? (
@@ -173,7 +206,7 @@ export function Studio() {
           body="Forge will ask the model for a new version. The current files stay in history so you can roll back."
           confirmLabel="Regenerate"
           onClose={() => setConfirmRegen(false)}
-          onConfirm={beginGeneration}
+          onConfirm={() => void beginGeneration(true)}
         />
       ) : null}
     </main>

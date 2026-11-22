@@ -15,17 +15,17 @@ export function TestPane({ project, onProject }: { project: Project; onProject: 
   const [busy, setBusy] = useState(false);
   const [log, setLog] = useState("");
 
-  async function smoke() {
+  async function smoke(play = false) {
     const node = host.current;
     if (!node) return [];
-    return runSmokeTest(projectRef.current.files, node, { assertions, signal: abort.current?.signal });
+    return runSmokeTest(projectRef.current.files, node, { assertions, play, signal: abort.current?.signal });
   }
 
-  async function run() {
+  async function run(play = false) {
     setBusy(true);
-    setStatus("Running smoke test…");
+    setStatus(play ? "Playing the game…" : "Running smoke test…");
     try {
-      const found = await smoke();
+      const found = await smoke(play);
       setIssues(found);
       setStatus(found.length ? "Smoke test failed" : "Smoke test passed");
     } catch (error) {
@@ -81,6 +81,9 @@ export function TestPane({ project, onProject }: { project: Project; onProject: 
     <div className="test-pane">
       <div className="button-row">
         <button type="button" className="primary" data-testid="smoke-run" disabled={busy} onClick={() => void run()}>Run smoke test</button>
+        {project.files.some((file) => file.path.startsWith("src/")) ? (
+          <button type="button" className="secondary" disabled={busy} onClick={() => void run(true)}>Play check</button>
+        ) : null}
         {issues && issues.length > 0 ? (
           <button type="button" className="secondary" data-testid="fix-it" disabled={busy} onClick={() => void fix()}>Fix it</button>
         ) : null}

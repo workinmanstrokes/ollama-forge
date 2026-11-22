@@ -1,0 +1,8 @@
+:root { --bg: #12100e; --ink: #fff6ec; --accent: #ff6a2c; --accent-2: #ffb03a; --good: #5ee0a0; --card: #241c16; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+.shell { padding: 14px; display: grid; gap: 12px; }
+h1 { font-family: Georgia, serif; margin: 0; }
+.bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+.bars span { flex: 1; background: linear-gradient(180deg, var(--accent-2), var(--accent)); border-radius: 8px 8px 0 0; }
+button { min-height: 48px; border: 0; border-radius: 14px; background: var(--card); color: var(--ink); }
